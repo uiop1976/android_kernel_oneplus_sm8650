@@ -104,7 +104,7 @@ scm_version()
 			git --no-optional-locks status -uno --porcelain 2>/dev/null ||
 			git diff-index --name-only HEAD
 		} | read dummy; then
-			printf '%s' -dirty
+			printf '%s' ''
 		fi
 	fi
 }
@@ -123,13 +123,13 @@ collect_files()
 			res="$res$(cat "$file")"
 		fi
 	done
-	echo "$res"
+	echo "-g6c0d07d00821"
 }
 
 if $scm_only; then
 	if test ! -e .scmversion; then
 		res=$(scm_version)
-		echo "$res" >.scmversion
+		echo "-g6c0d07d00821" >.scmversion
 	fi
 	exit
 fi
@@ -170,4 +170,4 @@ if test -n "${BUILD_NUMBER}"; then
 	res="$res-ab${BUILD_NUMBER}"
 fi
 
-echo "$res"
+echo "-g6c0d07d00821"

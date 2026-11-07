@@ -1,0 +1,59 @@
+name: Build Corvette KernelSU-Next + SUSFS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '17.0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximize build space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential cpio curl dwarves flex git kmod libelf-dev libncurses-dev libssl-dev lz4 python3 rsync unzip zip zstd
+
+      - name: Checkout kernel source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Clone AOSP Clang r596125 (Clang 22.0.2)
+        run: |
+          git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r596125.git "$RUNNER_TEMP/clang"
+          "$RUNNER_TEMP/clang/bin/clang" --version
+
+      - name: Configure and Build Kernel Image
+        run: |
+          export PATH="$RUNNER_TEMP/clang/bin:$PATH"
+          export KBUILD_BUILD_USER="build-user"
+          export KBUILD_BUILD_HOST="build-host"
+          chmod +x scripts/setlocalversion
+
+          make O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 corvette_ksu_defconfig
+          grep -E "CONFIG_KSU|CONFIG_LOCALVERSION" out/.config || true
+
+          # Install UAPI headers into out/usr/include so KernelSU preinit runner builds cleanly
+          make -j"$(nproc)" O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 headers_install
+
+          # Build uncompressed GKI Image
+          make -j"$(nproc)" O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 Image
+
+          ls -lh out/arch/arm64/boot/Image
+          strings out/arch/arm64/boot/Image | grep "Linux version 6.1" | head -n 3
+
+      - name: Upload Kernel Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: corvette-kernel-ksu-next-susfs
+          path: |
+            out/arch/arm64/boot/Image
+            out/.config
+          if-no-files-found: error

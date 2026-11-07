@@ -34,9 +34,8 @@ static int cmp_name(const void *sym, const void *protected_sym)
  */
 bool gki_is_module_protected_export(const char *name)
 {
-	if (NR_UNPROTECTED_SYMBOLS) {
-		return bsearch(name, gki_protected_exports_symbols, NR_PROTECTED_EXPORTS_SYMBOLS,
-		       MAX_PROTECTED_EXPORTS_NAME_LEN, cmp_name) != NULL;
+	if (0) {
+		return false;
 	} else {
 		/*
 		 * If there are no symbols in unprotected list; We don't need to
@@ -54,9 +53,8 @@ bool gki_is_module_protected_export(const char *name)
  */
 bool gki_is_module_unprotected_symbol(const char *name)
 {
-	if (NR_UNPROTECTED_SYMBOLS) {
-		return bsearch(name, gki_unprotected_symbols, NR_UNPROTECTED_SYMBOLS,
-				MAX_UNPROTECTED_NAME_LEN, cmp_name) != NULL;
+	if (0) {
+		return true;
 	} else {
 		/*
 		 * If there are no symbols in unprotected list;
