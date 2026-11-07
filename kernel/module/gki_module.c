@@ -22,7 +22,7 @@
 #define MAX_STRCMP_LEN (max(MAX_UNPROTECTED_NAME_LEN, MAX_PROTECTED_EXPORTS_NAME_LEN))
 
 /* bsearch() comparision callback */
-static int cmp_name(const void *sym, const void *protected_sym)
+static __maybe_unused int cmp_name(const void *sym, const void *protected_sym)
 {
 	return strncmp(sym, protected_sym, MAX_STRCMP_LEN);
 }
