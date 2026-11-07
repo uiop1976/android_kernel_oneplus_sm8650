@@ -25,6 +25,11 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Clone sm8650-modules for OPlus in-tree symlinks
+        run: |
+          git clone --depth=1 -b 17.0 https://github.com/crdroidandroid/android_kernel_oneplus_sm8650-modules.git ../sm8650-modules
+          ln -sfn ../sm8650-modules sm8650-modules
+
       - name: Clone AOSP Clang r596125 (Clang 22.0.2)
         run: |
           git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r596125.git "$RUNNER_TEMP/clang"
