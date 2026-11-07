@@ -48,7 +48,8 @@ jobs:
           # Install UAPI headers into out/usr/include so KernelSU preinit runner builds cleanly
           make -j"$(nproc)" O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 headers_install
 
-          # Fast pre-build verification of KernelSU, SUSFS, and module loader
+          # Generate SELinux flask.h/av_permissions.h and fast pre-verify KernelSU, SUSFS, and module loader
+          make -j"$(nproc)" O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 security/selinux/
           make -j"$(nproc)" O=out ARCH=arm64 LLVM=1 LLVM_IAS=1 drivers/kernelsu/ fs/susfs.o kernel/module/
 
           # Build uncompressed GKI Image
